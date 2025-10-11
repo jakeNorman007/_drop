@@ -5,10 +5,10 @@ import (
 )
 
 type Lexer struct {
-	input							string
-	current_position 	int
-	read_position			int
-	char							byte
+	input            string
+	current_position int
+	read_position    int
+	char             byte
 }
 
 func New_Lexer(input string) *Lexer {

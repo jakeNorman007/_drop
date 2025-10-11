@@ -10,17 +10,17 @@ type Token struct {
 }
 
 const (
-	ILLEGAL	TokenType = iota // 
-	EOF // end of file
+	ILLEGAL	TokenType = iota
+	EOF                         // end of file
 
 	IDENTIFIER
 
-	DROP_START // _drop
+	DROP_START                  // _drop
 
-	STRING // any content inside a string
+	STRING                      // any content inside a string
 
-	DOUBLE_LEFT_CURLY_BRACE // interpolation begin {{
-	DOUBLE_RIGHT_CURLY_BRACE // interpolation end }}
+	DOUBLE_LEFT_CURLY_BRACE     // interpolation begin {{
+	DOUBLE_RIGHT_CURLY_BRACE    // interpolation end }}
 
 	LEFT_PARENTHESES     = 0x28 // (
 	RIGHT_PARENTHESES    = 0x29 // )

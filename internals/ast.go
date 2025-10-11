@@ -7,8 +7,8 @@ import (
 )
 
 type Node interface {
-	Token_literal()		string
-	String()					string
+	Token_literal() string
+	String()        string
 }
 
 type Statement interface {
@@ -22,7 +22,7 @@ type Expression interface {
 }
 
 type Program struct {
-	Statements		[]Statement
+	Statements []Statement
 }
 
 func (program *Program) Token_literal() string {
@@ -43,21 +43,21 @@ func (program *Program) String() string {
 }
 
 type Identifier struct {
-	Token		Token // IDENTIFIER
-	Value		string
+	Token Token // IDENTIFIER
+	Value string
 }
 
 func (ident *Identifier) Token_literal() string { return ident.Token.Literal }
 func (ident *Identifier) String() string { return ident.Value }
 
 type Parameter struct {
-	Name		*Identifier
-	Type 		*Identifier
+	Name *Identifier
+	Type *Identifier
 }
 
 type BlockStatement struct {
-	Token					Token // first "{" after _drop function and go return type
-	Statements		[]Statement
+	Token Token 
+	Statements []Statement
 }
 
 func (block *BlockStatement) expression_node() {}
@@ -73,11 +73,11 @@ func (block *BlockStatement) String() string {
 }
 
 type DropFunction struct {
-	Token					Token
-	Name					*Identifier
-	Parameters		[]*Parameter
-	ReturnType		*Identifier
-	Body					*BlockStatement
+	Token			 Token
+	Name       *Identifier
+	Parameters []*Parameter
+	ReturnType *Identifier
+	Body       *BlockStatement
 }
 
 func (drop_func *DropFunction) statement_node() {}

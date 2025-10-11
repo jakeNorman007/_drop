@@ -6,10 +6,10 @@ import (
 )
 
 type Parser struct {
-	lexer						*Lexer
-	current_token		Token
-	peek_token			Token
-	errors					[]string
+	lexer         *Lexer
+	current_token Token
+	peek_token    Token
+	errors        []string
 }
 
 // NEED TO ORGANIZE THESE HELPER FUNCTIONS= =============================
