@@ -96,6 +96,7 @@ func (parser *Parser) Parse_drop_function() *DropFunction { // serves as entry p
 	function.Parameters = parser.parse_drop_function_parameters()
 
 	if parser.peek_token_is(IDENTIFIER) && !parser.peek_token_is(LEFT_CURLY_BRACE) {
+
 		parser.next_token()
 		function.ReturnType = &Identifier {
 			Token: parser.current_token,

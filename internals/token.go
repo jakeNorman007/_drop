@@ -5,45 +5,45 @@ import "fmt"
 type TokenType int
 
 type Token struct {
-	Type			TokenType
-	Literal		string
+	Type    TokenType
+	Literal string
 }
 
 const (
-	ILLEGAL	TokenType 	= iota // 
-	EOF											   // end of file
+	ILLEGAL	TokenType = iota // 
+	EOF // end of file
 
 	IDENTIFIER
 
-	DROP_START						 		 // _drop
+	DROP_START // _drop
 
-	STRING										 // any content inside a string
+	STRING // any content inside a string
 
-	DOUBLE_LEFT_CURLY_BRACE    // interpolation begin {{
-	DOUBLE_RIGHT_CURLY_BRACE	 // interpolation end }}
+	DOUBLE_LEFT_CURLY_BRACE // interpolation begin {{
+	DOUBLE_RIGHT_CURLY_BRACE // interpolation end }}
 
-	LEFT_PARENTHESES 		= 0x28 // (
-	RIGHT_PARENTHESES 	= 0x29 // )
-	LEFT_CURLY_BRACE 		= 0x7B // {
-	RIGHT_CURLY_BRACE 	= 0x7D // }
-	LESS_THAN           = 0x3C // <
-	GREATER_THAN			  = 0x3E // >
-	SLASH								= 0x2F // /
-	EQUALS							= 0x3D // =
-	SINGLE_QUOTE	      = 0x27 // '
-	COMMA								= 0x2C // ,
-	EXCLAMATION					= 0x21 // !
-	LOWER_A						  = 0x61 // a	
-	UPPER_A							= 0X41 // A
-	LOWER_Z             = 0x7A // z
-	UPPER_Z             = 0X5A // Z
-	UNDERSCORE					= 0x5F // _
-	TAB									= 0x09 // \t
-	SPACE								= 0x20 // space
-	NEW_LINE            = 0x0A // \n
-	CARRIAGE_RETURN			= 0x0D // \r
+	LEFT_PARENTHESES     = 0x28 // (
+	RIGHT_PARENTHESES    = 0x29 // )
+	LEFT_CURLY_BRACE     = 0x7B // {
+	RIGHT_CURLY_BRACE    = 0x7D // }
+	LESS_THAN            = 0x3C // <
+	GREATER_THAN         = 0x3E // >
+	SLASH                = 0x2F // /
+	EQUALS               = 0x3D // =
+	SINGLE_QUOTE         = 0x27 // '
+	COMMA                = 0x2C // ,
+	EXCLAMATION          = 0x21 // !
+	LOWER_A              = 0x61 // a	
+	UPPER_A              = 0X41 // A
+	LOWER_Z              = 0x7A // z
+	UPPER_Z              = 0X5A // Z
+	UNDERSCORE           = 0x5F // _
+	TAB                  = 0x09 // \t
+	SPACE                = 0x20 // space
+	NEW_LINE             = 0x0A // \n
+	CARRIAGE_RETURN      = 0x0D // \r
 
-	HTML_TEXT						= iota + 9999
+	HTML_TEXT            = iota + 9999
 )
 
 var keywords = map[string]TokenType {
