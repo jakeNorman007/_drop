@@ -3,7 +3,6 @@ package internals
 import (
 	"bytes"
 	"strings"
-	"_drop/internals"
 )
 
 type Node interface {
@@ -39,7 +38,7 @@ func (program *Program) String() string {
 	for _, stmnt := range program.Statements {
 		output.WriteString(stmnt.String())
 	}
-	return ""
+	return output.String()
 }
 
 type Identifier struct {
@@ -60,7 +59,7 @@ type BlockStatement struct {
 	Statements []Statement
 }
 
-func (block *BlockStatement) expression_node() {}
+func (block *BlockStatement) statement_node() {}
 func (block *BlockStatement) Token_literal() string { return block.Token.Literal}
 func (block *BlockStatement) String() string {
 	var output bytes.Buffer
@@ -73,7 +72,7 @@ func (block *BlockStatement) String() string {
 }
 
 type DropFunction struct {
-	Token			 Token
+	Token      Token
 	Name       *Identifier
 	Parameters []*Parameter
 	ReturnType *Identifier
@@ -87,7 +86,7 @@ func (drop_func *DropFunction) String() string {
 
 	parameters := []string{}
 	for _, param := range drop_func.Parameters {
-		parameters= append(parameters, param.Type.String())
+		parameters= append(parameters, param.Name.String() + " " + param.Type.String())
 	}
 
 	output.WriteString(drop_func.Token_literal() + " ")
@@ -106,3 +105,12 @@ func (drop_func *DropFunction) String() string {
 
 	return output.String()
 }
+
+type HTMLTextStatement struct {
+	Token Token
+	Value string
+}
+
+func (html *HTMLTextStatement) statement_node() {}
+func (html *HTMLTextStatement) Token_literal() string { return html.Token.Literal }
+func (html *HTMLTextStatement) String() string { return html.Value }

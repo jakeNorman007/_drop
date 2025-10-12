@@ -1,7 +1,7 @@
 package internals
 
 import (
-	"strings"
+	"fmt"
 )
 
 type Lexer struct {
@@ -12,6 +12,7 @@ type Lexer struct {
 }
 
 func New_Lexer(input string) *Lexer {
+	fmt.Println("New parser created")
 	lex := &Lexer {
 		input: input,
 	}
@@ -65,17 +66,17 @@ func (lex *Lexer) Next_token() Token {
 	case '\x2C':
 		tokn = new_token(COMMA, lex.char)
 	case '\x5F':
-		lex.read_char()
 		drop_start := lex.read_identifier()
 
-		if drop_start == "drop" {
-			tokn = Token{ Type: DROP_START, Literal: "_" + string(drop_start) }
+		var token_type TokenType
+
+		if drop_start == "_drop" {
+			token_type = DROP_START
 		} else {
-			tokn = new_token(UNDERSCORE, lex.char)
+			token_type = IDENTIFIER
 		}
-	case '0':
-		tokn.Literal = ""
-		tokn.Type = EOF
+
+		tokn = Token { Type: token_type, Literal: drop_start }
 	default:
 		if is_letter(lex.char) {
 			tokn.Literal = lex.read_identifier()
@@ -92,7 +93,16 @@ func (lex *Lexer) Next_token() Token {
 		if lex.char != '<' && lex.char != '{' {
 			literal := lex.read_html_text()
 
-			tokn = Token{ Type: HTML_TEXT, Literal: strings.TrimSpace(literal) }
+			if literal != "" {
+				tokn = Token{ Type: HTML_TEXT, Literal: literal }
+			} else if lex.char == 0 {
+				lex.read_char()
+				tokn = Token { Type: EOF, Literal: "" }
+			} else {
+				char := lex.char
+				lex.read_char()
+				tokn = new_token(ILLEGAL, char)
+			}
 			return tokn
 		}
 	}
@@ -152,13 +162,20 @@ func (lex *Lexer) read_string() string {
 }
 
 func (lex *Lexer) read_html_text() string {
-	position := lex.current_position
+	start := lex.current_position
+	for lex.char != '<' && lex.char != '{' && lex.char != 0 {
+			lex.read_char()
+	}
+	end := lex.current_position
 
-	for lex.char != LESS_THAN && lex.char !=  LEFT_CURLY_BRACE && lex.char != 0 {
-		lex.read_char()
+	if end > len(lex.input) {
+			end = len(lex.input)
 	}
 
-	return lex.input[position:lex.current_position]
+	if start > end {
+			start = end
+	}
+	return lex.input[start:end]
 }
 
 func is_letter(char byte) bool {

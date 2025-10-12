@@ -1,9 +1,6 @@
 package internals
 
-import (
-	"fmt"
-	"_drop/internals"
-)
+import "fmt"
 
 type Parser struct {
 	lexer         *Lexer
@@ -13,6 +10,10 @@ type Parser struct {
 }
 
 // NEED TO ORGANIZE THESE HELPER FUNCTIONS= =============================
+func (p *Parser) Errors() []string {
+    return p.errors
+}
+	
 func (parser *Parser) next_token() {
 	parser.current_token = parser.peek_token
 	parser.peek_token = parser.lexer.Next_token()
@@ -48,6 +49,7 @@ func (parser *Parser) Parse_program() *Program {
 	program.Statements = []Statement{}
 
 	for parser.current_token.Type != EOF {
+		fmt.Printf("DEBUG cur=%s peek=%s\n", parser.current_token.Type, parser.peek_token.Type)
 		stmnt := parser.parse_statement()
 
 		if stmnt != nil {
@@ -70,7 +72,7 @@ func (parser *Parser) parse_statement() Statement {
 }
 //= =====================================================================
 
-func New_lexer(lexer *Lexer) *Parser {
+func New_Parser(lexer *Lexer) *Parser {
 	parser := &Parser {
 		lexer: lexer,
 	}
@@ -95,7 +97,7 @@ func (parser *Parser) Parse_drop_function() *DropFunction { // serves as entry p
 	parser.next_token()
 	function.Parameters = parser.parse_drop_function_parameters()
 
-	if parser.peek_token_is(IDENTIFIER) && !parser.peek_token_is(LEFT_CURLY_BRACE) {
+	if parser.peek_token_is(IDENTIFIER) {
 
 		parser.next_token()
 		function.ReturnType = &Identifier {
@@ -114,6 +116,7 @@ func (parser *Parser) Parse_drop_function() *DropFunction { // serves as entry p
 }
 
 func (parser *Parser) parse_drop_function_parameters() []*Parameter {
+	fmt.Println("starting parse_drop_function")
 	parameters := []*Parameter {}
 
 	if parser.peek_token_is(RIGHT_PARENTHESES) {
@@ -123,13 +126,16 @@ func (parser *Parser) parse_drop_function_parameters() []*Parameter {
 	}
 
 	parser.next_token()
-	for !parser.current_token_is(RIGHT_PARENTHESES) {
+
+	for !parser.current_token_is(RIGHT_PARENTHESES) && !parser.current_token_is(EOF) {
+		fmt.Println("Entering main function for loop")
 		name := &Identifier {
 			Token: parser.current_token,
 			Value: parser.current_token.Literal,
 		}
 
 		parser.next_token()
+		
 		_type := &Identifier {
 			Token: parser.current_token,
 			Value: parser.current_token.Literal,
@@ -144,11 +150,17 @@ func (parser *Parser) parse_drop_function_parameters() []*Parameter {
 			parser.next_token()
 			parser.next_token()
 		} else {
-			break
+			parser.next_token()
 		}
 	}
 
-	parser.expect_peek(RIGHT_PARENTHESES)
+	if !parser.current_token_is(RIGHT_PARENTHESES) {
+		if parser.peek_token_is(RIGHT_PARENTHESES) {
+			parser.next_token()
+		} else {
+			parser.peek_error(RIGHT_PARENTHESES)
+		}
+	}
 
 	return parameters
 }
@@ -156,9 +168,12 @@ func (parser *Parser) parse_drop_function_parameters() []*Parameter {
 func (parser *Parser) parse_block_statement() *BlockStatement {
 	block := &BlockStatement {
 		Token: parser.current_token,
+		Statements: []Statement{},
 	}
 
-	for !parser.current_token_is(RIGHT_CURLY_BRACE) && parser.current_token_is(EOF){
+	parser.next_token()
+
+	for !parser.current_token_is(RIGHT_CURLY_BRACE) && !parser.current_token_is(EOF) {
 		stmnt := parser.parse_statement()
 		if stmnt != nil {
 			block.Statements = append(block.Statements, stmnt)

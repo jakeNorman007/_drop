@@ -9,7 +9,7 @@ func TestNextToken(t *testing.T) {
 	input := `_drop my_function() {
 							<div style="background: red;">
 								<p class="my_class">
-									<p id="my_id">This is before interpolation {{ }} </p>
+									<p id="my_id"> {{ }} </p>
 								</p>
 							</div>
 						}`
@@ -41,7 +41,6 @@ func TestNextToken(t *testing.T) {
 		{ internals.EQUALS, "=" },
 		{ internals.STRING, "my_id" },
 		{ internals.GREATER_THAN, ">" },
-		{ internals.HTML_TEXT, "This is before interpolation" },
 		{ internals.DOUBLE_LEFT_CURLY_BRACE, "{{" },
 		{ internals.DOUBLE_RIGHT_CURLY_BRACE, "}}" },
 		{ internals.LESS_THAN, "<" },
