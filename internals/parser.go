@@ -4,8 +4,8 @@ import "fmt"
 
 type Parser struct {
 	lexer         *Lexer
-	current_token Token
-	peek_token    Token
+	currentToken Token
+	peekToken    Token
 	errors        []string
 }
 
@@ -14,172 +14,166 @@ func (p *Parser) Errors() []string {
     return p.errors
 }
 	
-func (parser *Parser) next_token() {
-	parser.current_token = parser.peek_token
-	parser.peek_token = parser.lexer.Next_token()
+func (parser *Parser) nextToken() {
+	parser.currentToken = parser.peekToken
+	parser.peekToken = parser.lexer.NextToken()
 }
 
-func (parser *Parser) current_token_is(tokn TokenType) bool {
-	return parser.current_token.Type == tokn
+func (parser *Parser) currentTokenIs(tokn TokenType) bool {
+	return parser.currentToken.Type == tokn
 }
 
-func (parser *Parser) peek_token_is(tokn TokenType) bool {
-	return parser.peek_token.Type == tokn
+func (parser *Parser) peekTokenIs(tokn TokenType) bool {
+	return parser.peekToken.Type == tokn
 }
 
-func (parser *Parser) expect_peek(tokn TokenType) bool {
-	if parser.peek_token_is(tokn) {
-		parser.next_token()
+func (parser *Parser) expectPeek(tokn TokenType) bool {
+	if parser.peekTokenIs(tokn) {
+		parser.nextToken()
 
 		return true
 	} else {
-		parser.peek_error(tokn)
+		parser.peekError(tokn)
 
 		return false
 	}
 }
 
-func (parser *Parser) peek_error(tokn TokenType) {
-	message := fmt.Sprintf("expected the next token to be: %s, got %s instead", tokn, parser.peek_token.Type)
+func (parser *Parser) peekError(tokn TokenType) {
+	message := fmt.Sprintf("expected the next token to be: %s, got %s instead", tokn, parser.peekToken.Type)
 	parser.errors = append(parser.errors, message)
 }
 
-func (parser *Parser) Parse_program() *Program {
+func (parser *Parser) ParseProgram() *Program {
 	program := &Program {}
 	program.Statements = []Statement{}
 
-	for parser.current_token.Type != EOF {
-		fmt.Printf("DEBUG cur=%s peek=%s\n", parser.current_token.Type, parser.peek_token.Type)
-		stmnt := parser.parse_statement()
+	for parser.currentToken.Type != EOF {
+		stmnt := parser.parseStatement()
 
 		if stmnt != nil {
 			program.Statements = append(program.Statements, stmnt)
 		}
 
-		parser.next_token()
+		parser.nextToken()
 	}
 
 	return program
 }
 
-func (parser *Parser) parse_statement() Statement {
-	switch parser.current_token.Type {
+func (parser *Parser) parseStatement() Statement {
+	switch parser.currentToken.Type {
 	case DROP_START:
-		return parser.Parse_drop_function()
+		return parser.ParseDropFunction()
 	default:
 		return nil
 	}
 }
 //= =====================================================================
 
-func New_Parser(lexer *Lexer) *Parser {
-	parser := &Parser {
-		lexer: lexer,
-	}
+func NewParser(lexer *Lexer) *Parser {
+	parser := &Parser { lexer: lexer }
 
-	parser.next_token()
-	parser.next_token()
+	parser.nextToken()
+	parser.nextToken()
 
 	return parser
 }
 
-func (parser *Parser) Parse_drop_function() *DropFunction { // serves as entry point into _drop template
-	function := &DropFunction {
-		Token: parser.current_token,
-	}
+func (parser *Parser) ParseDropFunction() *DropFunction {
+	function := &DropFunction { Token: parser.currentToken }
 
-	parser.next_token()
-	function.Name = &Identifier {
-		Token: parser.current_token,
-		Value: parser.current_token.Literal,
-	}
-
-	parser.next_token()
-	function.Parameters = parser.parse_drop_function_parameters()
-
-	if parser.peek_token_is(IDENTIFIER) {
-
-		parser.next_token()
-		function.ReturnType = &Identifier {
-			Token: parser.current_token,
-			Value: parser.current_token.Literal,
-		}
-	}
-
-	if !parser.expect_peek(LEFT_CURLY_BRACE) {
+	if !parser.expectPeek(IDENTIFIER) {
 		return nil
 	}
 
-	function.Body = parser.parse_block_statement()
+	function.Name = &Identifier { Token: parser.currentToken, Value: parser.currentToken.Literal }
+
+	if !parser.expectPeek(LEFT_PARENTHESIS) {
+		return nil
+	}
+
+	function.Parameters = parser.parseDropFunctionParameters()
+
+	if parser.peekTokenIs(IDENTIFIER) {
+		parser.nextToken()
+		function.ReturnType = &Identifier { Token: parser.currentToken, Value: parser.currentToken.Literal }
+	}
+
+	if !parser.expectPeek(LEFT_CURLY_BRACE) {
+		return nil
+	}
+
+	function.Body = parser.parseBlockStatement()
 
 	return function
 }
 
-func (parser *Parser) parse_drop_function_parameters() []*Parameter {
-	fmt.Println("starting parse_drop_function")
+func (parser *Parser) parseDropFunctionParameters() []*Parameter {
 	parameters := []*Parameter {}
 
-	if parser.peek_token_is(RIGHT_PARENTHESES) {
-		parser.next_token()
+	if parser.peekTokenIs(RIGHT_PARENTHESIS) {
+		parser.nextToken()
 
 		return parameters
 	}
 
-	parser.next_token()
+	parser.nextToken()
 
-	for !parser.current_token_is(RIGHT_PARENTHESES) && !parser.current_token_is(EOF) {
-		fmt.Println("Entering main function for loop")
-		name := &Identifier {
-			Token: parser.current_token,
-			Value: parser.current_token.Literal,
-		}
-
-		parser.next_token()
-		
-		_type := &Identifier {
-			Token: parser.current_token,
-			Value: parser.current_token.Literal,
-		}
-		
-		parameters = append(parameters, &Parameter {
-			Name: name,
-			Type: _type,
-		})
-
-		if parser.peek_token_is(COMMA) {
-			parser.next_token()
-			parser.next_token()
-		} else {
-			parser.next_token()
-		}
+	parameter := &Parameter { 
+		Name: &Identifier { 
+			Token: parser.currentToken, 
+			Value: parser.currentToken.Literal,
+		},
 	}
 
-	if !parser.current_token_is(RIGHT_PARENTHESES) {
-		if parser.peek_token_is(RIGHT_PARENTHESES) {
-			parser.next_token()
-		} else {
-			parser.peek_error(RIGHT_PARENTHESES)
+	if !parser.expectPeek(IDENTIFIER) {
+		return nil
+	}
+
+	parameter.Type = &Identifier { Token: parser.currentToken, Value: parser.currentToken.Literal }
+	parameters = append(parameters, parameter)
+
+	for parser.peekTokenIs(COMMA) {
+		parser.nextToken()
+		parser.nextToken()
+
+		parameter := &Parameter { 
+			Name: &Identifier { 
+				Token: parser.currentToken, 
+				Value: parser.currentToken.Literal,
+			},
 		}
+
+		if !parser.expectPeek(IDENTIFIER) {
+			return nil
+		}
+
+		parameter.Type = &Identifier { Token: parser.currentToken, Value: parser.currentToken.Literal }
+		parameters = append(parameters, parameter)
+	}
+
+	if !parser.expectPeek(RIGHT_PARENTHESIS) {
+		return nil
 	}
 
 	return parameters
 }
 
-func (parser *Parser) parse_block_statement() *BlockStatement {
-	block := &BlockStatement {
-		Token: parser.current_token,
-		Statements: []Statement{},
-	}
+func (parser *Parser) parseBlockStatement() *BlockStatement {
+	block := &BlockStatement { Token: parser.currentToken, Statements: []Statement{} }
+	block.Statements = []Statement{}
 
-	parser.next_token()
+	parser.nextToken()
 
-	for !parser.current_token_is(RIGHT_CURLY_BRACE) && !parser.current_token_is(EOF) {
-		stmnt := parser.parse_statement()
+	for !parser.currentTokenIs(RIGHT_CURLY_BRACE) && !parser.currentTokenIs(EOF) {
+		stmnt := parser.parseStatement()
+
 		if stmnt != nil {
 			block.Statements = append(block.Statements, stmnt)
 		}
 
-		parser.next_token()
+		parser.nextToken()
 	}
 
 	return block

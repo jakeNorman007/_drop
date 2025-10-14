@@ -20,8 +20,8 @@ func TestNextToken(t *testing.T) {
 	}{
 		{ internals.DROP_START, "_drop" },
 		{ internals.IDENTIFIER, "my_function" },
-		{ internals.LEFT_PARENTHESES, "(" },
-		{ internals.RIGHT_PARENTHESES, ")" },
+		{ internals.LEFT_PARENTHESIS, "(" },
+		{ internals.RIGHT_PARENTHESIS, ")" },
 		{ internals.LEFT_CURLY_BRACE, "{" },
 		{ internals.LESS_THAN, "<" },
 		{ internals.IDENTIFIER, "div" },
@@ -58,10 +58,10 @@ func TestNextToken(t *testing.T) {
 		{ internals.RIGHT_CURLY_BRACE, "}" },
 	}
 
-	lex := internals.New_Lexer(input)
+	lex := internals.NewLexer(input)
 
 	for i, tt := range tests {
-		tokn := lex.Next_token()
+		tokn := lex.NextToken()
 
 		if tokn.Type != tt.expectedType {
 			t.Fatalf("tests[%d] -> token type incorrect. expected=(%d, %q) got=(%d, %q)", i, tt.expectedType, tt.expectedType, tokn.Type, tokn.Type)
@@ -70,9 +70,11 @@ func TestNextToken(t *testing.T) {
 		if tokn.Literal != tt.expectedLiteral {
 			t.Fatalf("tests[%d] -> literal incorrect. expected=%s got=%s", i, tt.expectedLiteral, tokn.Literal)
 
-			/* KEEPING THIS ERROR FORMAT JIC, HELPED DETERMINE NON EATEN WHITESPACE */
-			//t.Errorf("tests[%d] -> literal incorrect.\nexpected=%q\n     got=%q\nbytes expected=%v\nbytes got=%v", 
-    		//i, tt.expectedLiteral, tokn.Literal, []byte(tt.expectedLiteral), []byte(tokn.Literal))
+			/* 
+				KEEPING THIS ERROR FORMAT JIC, HELPED DETERMINE NON EATEN WHITESPACE
+				t.Errorf("tests[%d] -> literal incorrect.\nexpected=%q\n     got=%q\nbytes expected=%v\nbytes got=%v", 
+    		i, tt.expectedLiteral, tokn.Literal, []byte(tt.expectedLiteral), []byte(tokn.Literal))
+			*/
 		}
 	}
 }
@@ -88,8 +90,7 @@ func TestParseHtmlSkeleton(t *testing.T) {
 							</head>
 							<body>
 							</body>
-						</html>
-						`
+						</html>`
 
 	tests := []struct {
 		expectedType			internals.TokenType
@@ -149,10 +150,10 @@ func TestParseHtmlSkeleton(t *testing.T) {
 		{ internals.GREATER_THAN, ">" },
 	}
 
-	lex := internals.New_Lexer(input)
+	lex := internals.NewLexer(input)
 
 	for i, tt := range tests {
-		tokn := lex.Next_token()
+		tokn := lex.NextToken()
 
 		if tokn.Type != tt.expectedType {
 			t.Fatalf("tests[%d] -> token type incorrect. expected=(%d, %q) got=(%d, %q)", i, tt.expectedType, tt.expectedType, tokn.Type, tokn.Type)
@@ -163,11 +164,3 @@ func TestParseHtmlSkeleton(t *testing.T) {
 		}
 	}
 }
-
-// TODO:
-	// create repo [ ]
-	// parse strings for inline css styles [x]
-	// write test to parse HTML skeleton [x]
-	// clean up/refactor etc. [ ]
-	// figure out the whitespsce thing with interpolation [ ]
-

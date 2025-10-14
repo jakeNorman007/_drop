@@ -22,8 +22,8 @@ const (
 	DOUBLE_LEFT_CURLY_BRACE     // interpolation begin {{
 	DOUBLE_RIGHT_CURLY_BRACE    // interpolation end }}
 
-	LEFT_PARENTHESES     = 0x28 // (
-	RIGHT_PARENTHESES    = 0x29 // )
+	LEFT_PARENTHESIS     = 0x28 // (
+	RIGHT_PARENTHESIS    = 0x29 // )
 	LEFT_CURLY_BRACE     = 0x7B // {
 	RIGHT_CURLY_BRACE    = 0x7D // }
 	LESS_THAN            = 0x3C // <
@@ -50,7 +50,7 @@ var keywords = map[string]TokenType {
 	"_drop": DROP_START,
 }
 
-func Lookup_identifier(identifier string) TokenType {
+func LookupIdentifier(identifier string) TokenType {
     if tok, ok := keywords[identifier]; ok {
         return tok
     }
@@ -66,9 +66,9 @@ func(tokn TokenType) String() string {
 		return "EOF"
 	case DROP_START:
 		return "DROP_START"
-	case LEFT_PARENTHESES:
+	case LEFT_PARENTHESIS:
 		return "("
-	case RIGHT_PARENTHESES:
+	case RIGHT_PARENTHESIS:
 		return ")"
 	case LEFT_CURLY_BRACE:
 		return "{"
