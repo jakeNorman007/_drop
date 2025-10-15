@@ -73,7 +73,7 @@ func (lex *Lexer) NextToken() Token {
 
 		tokn = Token { Type: token_type, Literal: drop_start }
 	default:
-		if isLetter(lex.char) {
+		if isLetter(lex.char) || lex.char == '_' {
 			tokn.Literal = lex.readIdentifier()
 			tokn = Token{ Type: IDENTIFIER, Literal: tokn.Literal }
 			return tokn
@@ -157,13 +157,20 @@ func (lex *Lexer) readString() string {
 }
 
 func (lex *Lexer) readHtmlText() string {
-	startingPosition := lex.currentPosition
-
-	for lex.char != LESS_THAN && lex.char != LEFT_CURLY_BRACE && lex.char != 0 {
-			lex.readChar()
-	}
-
-	return lex.input[startingPosition:lex.currentPosition]
+	 position := lex.currentPosition
+    for lex.char != '<' && lex.char != 0 {
+        lex.readChar()
+        if lex.readPosition > len(lex.input) {
+            break
+        }
+    }
+    if position >= len(lex.input) {
+        return ""
+    }
+    if lex.currentPosition > len(lex.input) {
+        lex.currentPosition = len(lex.input)
+    }
+    return lex.input[position:lex.currentPosition]
 }
 
 func isLetter(char byte) bool {

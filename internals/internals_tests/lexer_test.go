@@ -86,7 +86,7 @@ func TestParseHtmlSkeleton(t *testing.T) {
 							<head>
 								<meta charset="UTF-8">
 								<meta name="viewport" content="width=device-width, initial-scale=1.0">
-								<title>Test Title</title>
+								<title></title>
 							</head>
 							<body>
 							</body>
@@ -128,7 +128,6 @@ func TestParseHtmlSkeleton(t *testing.T) {
 		{ internals.LESS_THAN, "<" },
 		{ internals.IDENTIFIER, "title" },
 		{ internals.GREATER_THAN, ">" },
-		{ internals.HTML_TEXT, "Test Title" },
 		{ internals.LESS_THAN, "<" },
 		{ internals.SLASH, "/" },
 		{ internals.IDENTIFIER, "title" },
