@@ -135,7 +135,7 @@ func (lex *Lexer) peekChar() byte {
 func (lex *Lexer) readIdentifier() string {
 	position := lex.currentPosition
 
-	for isLetter(lex.char) {
+	for isLetter(lex.char) || isDigit(lex.char){
 		lex.readChar()
 	}
 
@@ -175,6 +175,10 @@ func (lex *Lexer) readHtmlText() string {
 
 func isLetter(char byte) bool {
 	return LOWER_A <= char && char <= LOWER_Z || UPPER_A <= char && UPPER_Z <= char || char == UNDERSCORE
+}
+
+func isDigit(ch byte) bool {
+    return '0' <= ch && ch <= '9'
 }
 
 func isClosingTag(char byte) bool {

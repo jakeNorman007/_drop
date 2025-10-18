@@ -30,9 +30,9 @@ func TestParseDropFunction(t *testing.T) {
             expectedReturn: "int",
         },
         {
-            input:          "_drop example(arg string, arg2 string) string {}",
+            input:          "_drop example(name string, email string) string {}",
             expectedName:   "example",
-            expectedParams: []string{"arg", "arg2"},
+            expectedParams: []string{"name", "email"},
             expectedTypes:  []string{"string", "string"},
             expectedReturn: "string",
         },
