@@ -73,7 +73,7 @@ func (lex *Lexer) NextToken() Token {
 			tokn = Token { Type: IDENTIFIER, Literal: literal } 
 		}
 	default:
-		if isLetter(lex.char) || lex.char == '\x5F' {
+	if isLetter(lex.char) || lex.char == '\x5F' {
 			start, end := lex.readIdentifierIdx()
 			tokn = Token { Type: IDENTIFIER, Literal: lex.input[start:end] }
 			return tokn
@@ -82,23 +82,18 @@ func (lex *Lexer) NextToken() Token {
 			tokn = Token { Type: IDENTIFIER, Literal: lex.input[start:end] }
 			return tokn
 		} else {
-			tokn = newToken(ILLEGAL, lex.char)
-		}
-
-		if lex.char != '\x3C' && lex.char != '\x7B' {
 			start, end := lex.readHtmlTextIdx()
 
 			if start != end {
 				tokn = Token { Type: HTML_TEXT, Literal: lex.input[start:end] }
-			} else if lex.char == 0 {
-				lex.readChar()
-				tokn = Token { Type: EOF, Literal: "" }
-			} else {
-				char := lex.char
-				lex.readChar()
-				tokn = newToken(ILLEGAL, char)
+				return tokn
 			}
-			return tokn
+
+			if lex.char == 0 {
+				tokn = Token{Type: EOF, Literal: ""}
+			} else {
+				tokn = newToken(ILLEGAL, lex.char)
+			}
 		}
 	}
 
@@ -106,7 +101,6 @@ func (lex *Lexer) NextToken() Token {
 
 	return tokn
 }
-
 
 func (lex *Lexer) readChar() {
 	if lex.readPosition >= len(lex.input) {
@@ -116,7 +110,10 @@ func (lex *Lexer) readChar() {
 	}
 
 	lex.currentPosition = lex.readPosition
-	lex.readPosition += 1
+
+	if lex.readPosition < len(lex.input) {
+		lex.readPosition++
+	}
 }
 
 func (lex *Lexer) peekChar() byte {
@@ -151,18 +148,6 @@ func (lex *Lexer) readStringIdx() (start, end int) {
 	}
 
 	end = lex.currentPosition
-
-	if lex.char == '\x22' {
-		end = lex.currentPosition
-	}
-
-	if end > len(lex.input) {
-		end = len(lex.input)
-	}
-
-	if end < start {
-		end = start
-	}
 
 	return
 }
