@@ -31,6 +31,7 @@ const (
 	SLASH                = 0x2F // /
 	EQUALS               = 0x3D // =
 	SINGLE_QUOTE         = 0x27 // '
+	DOUBLE_QUOTE         = 0x22 // "
 	COMMA                = 0x2C // ,
 	EXCLAMATION          = 0x21 // !
 	LOWER_A              = 0x61 // a	
@@ -86,6 +87,8 @@ func(tokn TokenType) String() string {
 		return "="
 	case SINGLE_QUOTE:
 		return "'" 
+	case DOUBLE_QUOTE:
+		return "\"" 
 	case COMMA:
 		return ","
 	case EXCLAMATION:

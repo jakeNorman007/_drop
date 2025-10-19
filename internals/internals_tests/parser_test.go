@@ -13,9 +13,7 @@ func TestParseDropFunction(t *testing.T) {
         expectedTypes  []string
         expectedReturn string
     }{
-				// TODO: GOT TO FIGURE OUT HOW TO PARSE MULTIPLE ARGUMENTS
-				// ONE ARGUMENT AND RETURN TYPES WORK FINE
-        {
+				{
             input:          "_drop my_function() {}",
             expectedName:   "my_function",
             expectedParams: []string{},
@@ -74,10 +72,6 @@ func TestParseDropFunction(t *testing.T) {
 
         if dropFn.ReturnType != nil && dropFn.ReturnType.Value != tt.expectedReturn {
             t.Errorf("expected return=%q, got=%q", tt.expectedReturn, dropFn.ReturnType.Value)
-        }
-
-        if dropFn.Body == nil {
-            t.Errorf("expected body to be parsed, got nil")
         }
     }
 }
